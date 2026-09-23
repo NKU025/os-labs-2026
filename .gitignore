@@ -1,0 +1,39 @@
+# Reproducible build outputs
+labcodes/**/obj/
+labcodes/**/bin/
+*.o
+*.d
+*.elf
+*.img
+
+# Editor and OS temporary files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+__pycache__/
+*.pyc
+
+# Local environments and downloads
+.venv/
+venv/
+downloads/
+*.zip
+*.tar.gz
+*.tar.xz
+
+# Secrets and personal configuration
+.env
+.env.*
+!.env.example
+.netrc
+_netrc
+*.pem
+*.key
+id_rsa
+id_ed25519
+
+# Do not ignore all *.log: selected experiment logs belong in evidence/.
