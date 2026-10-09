@@ -1,6 +1,6 @@
 # Reproducible build outputs
-labcodes/**/obj/
-labcodes/**/bin/
+code/obj/
+code/bin/
 *.o
 *.d
 *.elf
@@ -36,4 +36,4 @@ _netrc
 id_rsa
 id_ed25519
 
-# Do not ignore all *.log: selected experiment logs belong in evidence/.
+# Do not ignore *.log or screenshots: selected evidence belongs in report/.
