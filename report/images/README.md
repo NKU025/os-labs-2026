@@ -1,15 +1,23 @@
-# Lab1 测试结果截图
+# Lab1 实验截图
 
-本目录为老师要求的 `report/images/`，保存实验报告中提及的测试结果截图。目前只有存放说明，尚无实际截图；本说明用于让 Git 保留该目录，不代表已经完成测试。
+本目录保存本次实验的 15 张原始截图。报告正文选用 01、02、03、08、09、10，其余截图保留为补充记录。
 
-建议保存：
+| 文件 | 内容 |
+| --- | --- |
+| 01-build.png | 编译退出状态和生成文件 |
+| 02-kernel-boot.png | 正常运行时的内核输出 |
+| 03-gdb-reset.png | 初始 PC 与复位处反汇编 |
+| 04-reset-step1.png | auipc 设置 t0 |
+| 05-reset-step2.png | 设置设备树地址参数 a1 |
+| 06-reset-step3.png | 读取 hart 编号 |
+| 07-reset-step4.png | 读取 OpenSBI 启动地址 |
+| 08-enter-opensbi.png | 跳转进入 OpenSBI |
+| 09-kernel-entry.png | 命中内核入口断点 |
+| 10-kernel-stack.png | 内核栈指针初始化 |
+| 11-enter-kern-init.png | 进入 C 函数 kern_init |
+| 12-memset-args.png | 清零调用参数 |
+| 13-cprintf-args.png | 打印调用参数 |
+| 14-kernel-loop.png | 打印后进入无限循环 |
+| 15-debug-boot-output.png | 调试运行时的内核输出 |
 
-- 构建结果与退出状态的截图。
-- 内核自身启动输出的截图。
-- GDB 连接、初始 PC、最初几条指令和关键寄存器的截图。
-- 到达 OpenSBI、内核入口、栈初始化与 C 入口的截图。
-- 实际问题与复测结果的截图。
-
-文件名应能说明用途。`report/report.md` 使用 `images/文件名.png` 等相对路径引用实际截图。文本日志可写入报告正文或另存为 `report/` 内附件，而不代替要求的测试截图。
-
-提交前检查截图和日志，去掉与实验无关的账户信息、凭据及私人路径；保留解释结论所需的技术上下文。不要以 AI 生成的文本代替实测日志。
+文本记录见 [GDB 日志](../gdb-session.log)和[构建日志](../build.log)。
