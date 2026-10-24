@@ -1,23 +1,13 @@
-# Lab1 实验截图
+# Lab2 测试截图
 
-本目录保存本次实验的 15 张原始截图。报告正文选用 01、02、03、08、09、10，其余截图保留为补充记录。
+本目录仅保存本次实验实际产生的截图，不沿用 Lab1 结果。
 
-| 文件 | 内容 |
-| --- | --- |
-| 01-build.png | 编译退出状态和生成文件 |
-| 02-kernel-boot.png | 正常运行时的内核输出 |
-| 03-gdb-reset.png | 初始 PC 与复位处反汇编 |
-| 04-reset-step1.png | auipc 设置 t0 |
-| 05-reset-step2.png | 设置设备树地址参数 a1 |
-| 06-reset-step3.png | 读取 hart 编号 |
-| 07-reset-step4.png | 读取 OpenSBI 启动地址 |
-| 08-enter-opensbi.png | 跳转进入 OpenSBI |
-| 09-kernel-entry.png | 命中内核入口断点 |
-| 10-kernel-stack.png | 内核栈指针初始化 |
-| 11-enter-kern-init.png | 进入 C 函数 kern_init |
-| 12-memset-args.png | 清零调用参数 |
-| 13-cprintf-args.png | 打印调用参数 |
-| 14-kernel-loop.png | 打印后进入无限循环 |
-| 15-debug-boot-output.png | 调试运行时的内核输出 |
+建议在以下验证完成时记录：
 
-文本记录见 [GDB 日志](../gdb-session.log)和[构建日志](../build.log)。
+1. 内核成功编译、启动及物理内存范围输出。
+2. First-Fit 与 Best-Fit 的测试输出，保留正在使用的管理器名称。
+3. Buddy 的分裂、合并及边界情况测试结果。
+4. SLUB 不同大小对象的分配、释放及边界情况测试结果。
+5. 框架 `make grade` 的真实结果。
+
+目前暂无实验测试截图。截图应包含相关命令和完整关键输出，在报告中说明验证了什么。
