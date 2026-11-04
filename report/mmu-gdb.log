@@ -1,0 +1,110 @@
+Host GDB tracing QEMU 4.1.1; target DTB magic VA=0xffffffffc2200000
+
+=== Bare-mode instruction fetch at physical 0x1000 ===
+Breakpoint 1 at 0x3cd55d: file /home/wyh/os-lab/src/qemu-4.1.1/target/riscv/cpu_helper.c, line 158.
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/usr/lib/x86_64-linux-gnu/libthread_db.so.1".
+[New Thread 0x7ffff794f6c0 (LWP 1512)]
+[New Thread 0x7ffff4fff6c0 (LWP 1513)]
+[Switching to Thread 0x7ffff4fff6c0 (LWP 1513)]
+
+Thread 3 "qemu-system-ris" hit Breakpoint 1, get_physical_address (env=0x55555651bae0, physical=0x7ffff4ffe6f0, prot=0x7ffff4ffe6e4, addr=4096, access_type=2, mmu_idx=3) at /home/wyh/os-lab/src/qemu-4.1.1/target/riscv/cpu_helper.c:158
+158	{
+#0  get_physical_address (env=0x55555651bae0, physical=0x7ffff4ffe6f0, prot=0x7ffff4ffe6e4, addr=4096, access_type=2, mmu_idx=3) at /home/wyh/os-lab/src/qemu-4.1.1/target/riscv/cpu_helper.c:158
+#1  0x000055555592226f in riscv_cpu_tlb_fill (cs=0x5555565130d0, address=4096, size=0, access_type=MMU_INST_FETCH, mmu_idx=3, probe=false, retaddr=0) at /home/wyh/os-lab/src/qemu-4.1.1/target/riscv/cpu_helper.c:451
+#2  0x00005555558676b8 in tlb_fill (cpu=0x5555565130d0, addr=4096, size=0, access_type=MMU_INST_FETCH, mmu_idx=3, retaddr=0) at /home/wyh/os-lab/src/qemu-4.1.1/accel/tcg/cputlb.c:878
+#3  0x0000555555867d5f in get_page_addr_code (env=0x55555651bae0, addr=4096) at /home/wyh/os-lab/src/qemu-4.1.1/accel/tcg/cputlb.c:1032
+#4  0x000055555588c800 in tb_htable_lookup (cpu=0x5555565130d0, pc=4096, cs_base=0, flags=3, cf_mask=4278714368) at /home/wyh/os-lab/src/qemu-4.1.1/accel/tcg/cpu-exec.c:339
+#5  0x000055555588bd4d in tb_lookup__cpu_state (cpu=0x5555565130d0, pc=0x7ffff4ffe8f8, cs_base=0x7ffff4ffe8f0, flags=0x7ffff4ffe8ec, cf_mask=4278714368) at /home/wyh/os-lab/src/qemu-4.1.1/include/exec/tb-lookup.h:43
+#6  0x000055555588caca in tb_find (cpu=0x5555565130d0, last_tb=0x0, tb_exit=0, cf_mask=524288) at /home/wyh/os-lab/src/qemu-4.1.1/accel/tcg/cpu-exec.c:406
+$1 = 0x1000
+$2 = 3
+$3 = 0x0
+163	    int mode = mmu_idx;
+165	    if (mode == PRV_M && access_type != MMU_INST_FETCH) {
+171	    if (mode == PRV_M || !riscv_feature(env, RISCV_FEATURE_MMU)) {
+0x000055555592226f in riscv_cpu_tlb_fill (cs=0x5555565130d0, address=4096, size=0, access_type=MMU_INST_FETCH, mmu_idx=3, probe=false, retaddr=0) at /home/wyh/os-lab/src/qemu-4.1.1/target/riscv/cpu_helper.c:451
+451	    ret = get_physical_address(env, &pa, &prot, address, access_type, mmu_idx);
+Value returned is $4 = 0
+$5 = 0x1000
+
+=== Load DTB magic: software TLB miss ===
+Breakpoint 2 at 0x555555868569: load_helper. (14 locations)
+
+Thread 3 "qemu-system-ris" hit Breakpoint 2.4, load_helper (env=0x55555651bae0, addr=18446744072671461376, oi=97, retaddr=140737304177748, size=4, big_endian=false, code_read=false, full_load=0x5555558699d9 <full_le_ldul_mmu>) at /home/wyh/os-lab/src/qemu-4.1.1/accel/tcg/cputlb.c:1252
+1252	    uintptr_t mmu_idx = get_mmuidx(oi);
+load_helper (env=0x55555651bae0, addr=18446744072671461376, oi=97, retaddr=140737304177748, size=4, big_endian=false, code_read=false, full_load=0x5555558699d9 <full_le_ldul_mmu>) at /home/wyh/os-lab/src/qemu-4.1.1/accel/tcg/cputlb.c:1271
+1271	    if (!tlb_hit(tlb_addr, addr)) {
+$6 = 0xffffffffc2200000
+$7 = 1
+$8 = 0
+$9 = 0xffffffffc0200000
+#0  load_helper (env=0x55555651bae0, addr=18446744072671461376, oi=97, retaddr=140737304177748, size=4, big_endian=false, code_read=false, full_load=0x5555558699d9 <full_le_ldul_mmu>) at /home/wyh/os-lab/src/qemu-4.1.1/accel/tcg/cputlb.c:1271
+#1  full_le_ldul_mmu (env=0x55555651bae0, addr=18446744072671461376, oi=97, retaddr=140737304177748) at /home/wyh/os-lab/src/qemu-4.1.1/accel/tcg/cputlb.c:1423
+#2  0x000055555586a0d2 in helper_le_ldul_mmu (env=0x55555651bae0, addr=18446744072671461376, oi=97, retaddr=140737304177748) at /home/wyh/os-lab/src/qemu-4.1.1/accel/tcg/cputlb.c:1430
+#3  0x00007ffff505ad1c in code_gen_buffer ()
+#4  0x000055555588c2b0 in cpu_tb_exec (cpu=0x5555565130d0, itb=0x7ffff505ab40 <code_gen_buffer+371475>) at /home/wyh/os-lab/src/qemu-4.1.1/accel/tcg/cpu-exec.c:173
+Temporary breakpoint 3 at 0x55555592155d: file /home/wyh/os-lab/src/qemu-4.1.1/target/riscv/cpu_helper.c, line 158.
+
+Thread 3 "qemu-system-ris" hit Temporary breakpoint 3, get_physical_address (env=0x55555651bae0, physical=0x7ffff4ffe240, prot=0x7ffff4ffe234, addr=18446744072671461376, access_type=0, mmu_idx=1) at /home/wyh/os-lab/src/qemu-4.1.1/target/riscv/cpu_helper.c:158
+158	{
+
+=== Sv39 page-table walk ===
+$10 = 0xffffffffc2200000
+$11 = 0x8000000000080206
+$12 = 1
+get_physical_address (env=0x55555651bae0, physical=0x7ffff4ffe240, prot=0x7ffff4ffe234, addr=18446744072671461376, access_type=0, mmu_idx=1) at /home/wyh/os-lab/src/qemu-4.1.1/target/riscv/cpu_helper.c:256
+256	        if (!(pte & PTE_V)) {
+259	        } else if (!(pte & (PTE_R | PTE_W | PTE_X))) {
+$13 = 3
+$14 = 0
+$15 = 18
+$16 = 0x80206000
+$17 = 511
+$18 = 0x80206ff8
+$19 = 0x200000cf
+$20 = 0x80000
+
+=== Step through leaf, privilege and permission checks ===
+262	        } else if ((pte & (PTE_R | PTE_W | PTE_X)) == PTE_W) {
+265	        } else if ((pte & (PTE_R | PTE_W | PTE_X)) == (PTE_W | PTE_X)) {
+268	        } else if ((pte & PTE_U) && ((mode != PRV_U) &&
+273	        } else if (!(pte & PTE_U) && (mode != PRV_S)) {
+276	        } else if (ppn & ((1ULL << ptshift) - 1)) {
+279	        } else if (access_type == MMU_DATA_LOAD && !((pte & PTE_R) ||
+283	        } else if (access_type == MMU_DATA_STORE && !(pte & PTE_W)) {
+286	        } else if (access_type == MMU_INST_FETCH && !(pte & PTE_X)) {
+get_physical_address (env=0x55555651bae0, physical=0x7ffff4ffe240, prot=0x7ffff4ffe234, addr=18446744072671461376, access_type=0, mmu_idx=1) at /home/wyh/os-lab/src/qemu-4.1.1/target/riscv/cpu_helper.c:334
+334	            *physical = (ppn | (vpn & ((1L << ptshift) - 1))) << PGSHIFT;
+337	            if ((pte & PTE_R) || ((pte & PTE_X) && mxr)) {
+$21 = 0x82200000
+0x000055555592226f in riscv_cpu_tlb_fill (cs=0x5555565130d0, address=18446744072671461376, size=4, access_type=MMU_DATA_LOAD, mmu_idx=1, probe=false, retaddr=140737304177748) at /home/wyh/os-lab/src/qemu-4.1.1/target/riscv/cpu_helper.c:451
+451	    ret = get_physical_address(env, &pa, &prot, address, access_type, mmu_idx);
+Value returned is $22 = 0
+
+=== Fill software TLB ===
+Temporary breakpoint 4 at 0x5555558675ad: file /home/wyh/os-lab/src/qemu-4.1.1/accel/tcg/cputlb.c, line 847.
+
+Thread 3 "qemu-system-ris" hit Temporary breakpoint 4, tlb_set_page (cpu=0x5555565130d0, vaddr=18446744072671461376, paddr=2183135232, prot=7, mmu_idx=1, size=4096) at /home/wyh/os-lab/src/qemu-4.1.1/accel/tcg/cputlb.c:847
+847	    tlb_set_page_with_attrs(cpu, vaddr, paddr, MEMTXATTRS_UNSPECIFIED,
+$23 = 0xffffffffc2200000
+$24 = 0x82200000
+$25 = 7
+$26 = 1
+$27 = 4096
+riscv_cpu_tlb_fill (cs=0x5555565130d0, address=18446744072671461376, size=4, access_type=MMU_DATA_LOAD, mmu_idx=1, probe=false, retaddr=140737304177748) at /home/wyh/os-lab/src/qemu-4.1.1/target/riscv/cpu_helper.c:474
+474	        return true;
+0x00005555558676b8 in tlb_fill (cpu=0x5555565130d0, addr=18446744072671461376, size=4, access_type=MMU_DATA_LOAD, mmu_idx=1, retaddr=140737304177748) at /home/wyh/os-lab/src/qemu-4.1.1/accel/tcg/cputlb.c:878
+878	    ok = cc->tlb_fill(cpu, addr, size, access_type, mmu_idx, false, retaddr);
+Value returned is $28 = true
+load_helper (env=0x55555651bae0, addr=18446744072671461376, oi=97, retaddr=140737304177748, size=4, big_endian=false, code_read=false, full_load=0x5555558699d9 <full_le_ldul_mmu>) at /home/wyh/os-lab/src/qemu-4.1.1/accel/tcg/cputlb.c:1276
+1276	            index = tlb_index(env, mmu_idx, addr);
+1277	            entry = tlb_entry(env, mmu_idx, addr);
+1279	        tlb_addr = code_read ? entry->addr_code : entry->addr_read;
+$29 = 0xffffffffc2200000
+$30 = 0x80001fe00000
+$31 = 0x7fffe2000000
+$32 = 0xedfe0dd0
+
+MMU TRACE COMPLETED
+[Inferior 1 (process 1509) killed]

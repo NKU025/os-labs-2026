@@ -1,0 +1,12 @@
+[PageInit boundary] 64 MiB: PASS
+[PageInit boundary] 128 MiB: PASS
+[PageInit boundary] 256 MiB capped by framework: PASS
+[PageInit boundary] unaligned end excludes partial page: PASS
+[PageInit boundary] zero size: PASS
+[PageInit boundary] invalid base: PASS
+[PageInit boundary] base beyond kernel: PASS
+[PageInit boundary] range addition overflow: PASS
+[PageInit boundary] RAM ends before kernel tail: PASS
+[PageInit boundary] no room for descriptors: PASS
+[PageInit boundary] descriptors fit but no complete free page: PASS
+[PageInit boundary] ALL 11 TESTS PASSED

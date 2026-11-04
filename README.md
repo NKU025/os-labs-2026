@@ -2,49 +2,37 @@
 
 小组成员：2412509-王毅豪、2413446-黄泓懿。
 
-当前为 lab2 分支，仅导入课程初始框架，尚未实现实验任务。Lab1 的源码、报告和测试记录保留在 lab1 分支。
+本分支为 lab2，code/ 保存实现后的源码，report/ 保存报告、提示词位置、真实日志和结果图。Lab1 的源码及报告仍在 lab1 分支，未改动。
 
-## 提交目录
+## 实验内容
 
-- code/：Lab2 源码，编译和运行均在此目录进行。
-- report/report.md：实验报告框架，按实际过程补充。
-- report/prompt.md：本实验实际使用的提示词。
-- report/images/：本实验测试截图。
+- [x] 物理内存探测与 page_init 初始化。
+- [x] First-Fit 分析、Best-Fit 实现与接入。
+- [x] Buddy 实现及分裂、合并、耗尽、回收测试。
+- [x] 简化 SLUB 与三种下层页分配器的组合验证。
+- [x] QEMU 4.1.1 的页表查询、软件 TLB 调试。
+- [x] 按 Lab1 最终报告格式整理 Lab2 报告。
+- [x] 整理各模块任务提示词，Buddy 和 SLUB 分别保留实现与测试两份。
+- [x] 补充小组模块分工与报告分工。
+- [x] 纳入黄泓懿提供的 6 张终端截图，区分组员独立工程截图与当前仓库日志。
 
-源码来自本地课程资料 lab2/lab2_new，导入时未修改源码和测试。
-[课程指导书](http://8.135.34.58/lab2026/_book/)
+## 阅读入口
 
-## 开始实验
+- [实验报告](report/report.md)
+- [任务提示词](report/prompt.md)
+- [测试证据索引](report/images/README.md)
+- [复现与调试说明](code/tools/DEBUGGING.md)
 
-在操作系统课程的 WSL Ubuntu 中执行：
+## 本次验证（2026-10-26）
+
+11 项初始化边界测试通过；First-Fit、Best-Fit、Buddy 在 64/128 MiB 下自检和 SLUB 均通过；Best-Fit 内部测试 6/6，课程评分 20/20。评分覆盖初始化和 Best-Fit，Buddy/SLUB 另有自编断言测试。
 
 ```bash
 cd /mnt/d/Courses/OS/os-labs-2026/code
-make
+bash tools/verify_lab2.sh
+make qemu
 ```
 
-初始框架的 page_init() 和 Best-Fit 模块尚未实现，首次编译出现相关错误属于待完成项，不是测试通过记录。不要修改框架测试来绕过错误。
+默认 Best-Fit，使用 make qemu PMM=buddy 切换 Buddy。自动验证脚本最后恢复默认镜像。已单独验证客体虚拟地址 0xffffffffc2200000 翻译到物理地址 0x82200000，调试脚本和路径说明见上面的调试文档。
 
-实现并成功编译后，用 make qemu 运行；调试时分别在两个终端用 make debug 和 make gdb。退出 QEMU：按 Ctrl+A，松开，再按 X。
-
-本框架提供 make grade；其覆盖范围须结合 tools/grade.sh、tools/inject.py 和测试源码检查，不能替代 Buddy、SLUB 所需的自编测试。
-
-## 任务顺序
-
-- [ ] 实现 page_init()，初始化物理页描述符和空闲区。
-- [ ] 阅读 First-Fit，解释初始化、分配、释放和合并过程。
-- [ ] 实现并接入 Best-Fit，保持框架的两个测试函数不变。
-- [ ] 实现并接入 Buddy，设计测试并说明边界覆盖。
-- [ ] 实现并接入简化 SLUB，设计对象分配与释放测试。
-- [ ] 整理真实提示词、调试过程、测试截图和报告。
-
-Buddy 和 SLUB 分别记录实现与测试两份提示词。可选 Challenge 按实际完成情况记录。提交前保留任务标记，将相应 YOUR CODE 标记按课程要求替换为学号。
-
-工具链、QEMU、编译产物和其他实验材料不纳入本次提交。
-
-## 初始检查记录（2026-10-24）
-
-- 39 个源码文件与课程提供的初始目录逐一进行 SHA-256 校验，内容一致。
-- 已核对 WSL Ubuntu 26.04（x86_64）、RISC-V GCC 10.2.0、RISC-V GDB 10.1、QEMU 4.1.1 和 GNU Make 4.4.1。
-- 执行 `make -B -k -j2` 做初始编译检查，make 退出码为 2。错误涉及尚未实现的 `page_init()` 及 Best-Fit 的 `free_list`、`nr_free`，未为绕过这些错误修改源码。
-- 尚未启动本次内核，未运行 make grade 或分配器测试；报告中的实验结果仍待填写。
+源码基于老师提供的 lab2/lab2_new；课程测试与 First-Fit 原实现保持不变。工具链、QEMU 二进制和编译产物不纳入仓库。

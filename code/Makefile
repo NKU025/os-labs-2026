@@ -35,6 +35,14 @@ CFLAGS	+= -fno-builtin -Wall -O2 -nostdinc $(DEFS)
 CFLAGS	+= -fno-stack-protector -ffunction-sections -fdata-sections
 CFLAGS	+= -g
 CFLAGS2 = $(CFLAGS) -D ucore_test
+PMM ?= best_fit
+ifeq ($(PMM),buddy)
+CFLAGS += -DPMM_USE_BUDDY
+else ifeq ($(PMM),first_fit)
+CFLAGS += -DPMM_USE_FIRST_FIT
+else ifneq ($(PMM),best_fit)
+$(error PMM must be best_fit, first_fit or buddy)
+endif
 CTYPE	:= c S
 LD      := $(GCCPREFIX)ld
 LDFLAGS	:= -m elf64lriscv
@@ -142,6 +150,15 @@ $(call create_target,ucore.img)
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 $(call finish_all)
+
+# Switching allocator or make test must invalidate old object files.
+.PHONY: FORCE_CONFIG
+obj/.build-config: FORCE_CONFIG
+	@mkdir -p obj
+	@printf '%s\n' '$(PMM) $(filter test,$(MAKECMDGOALS))' > obj/.build-config.tmp
+	@cmp -s $@ obj/.build-config.tmp || cp obj/.build-config.tmp $@
+	@rm -f obj/.build-config.tmp
+$(ALLOBJS): obj/.build-config
 
 IGNORE_ALLDEPS	= clean \
 				  dist-clean \
