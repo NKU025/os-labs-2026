@@ -1,4 +1,4 @@
-PROJ	:= lab2
+PROJ	:= lab3
 EMPTY	:=
 SPACE	:= $(EMPTY) $(EMPTY)
 SLASH	:= /
@@ -35,14 +35,6 @@ CFLAGS	+= -fno-builtin -Wall -O2 -nostdinc $(DEFS)
 CFLAGS	+= -fno-stack-protector -ffunction-sections -fdata-sections
 CFLAGS	+= -g
 CFLAGS2 = $(CFLAGS) -D ucore_test
-PMM ?= best_fit
-ifeq ($(PMM),buddy)
-CFLAGS += -DPMM_USE_BUDDY
-else ifeq ($(PMM),first_fit)
-CFLAGS += -DPMM_USE_FIRST_FIT
-else ifneq ($(PMM),best_fit)
-$(error PMM must be best_fit, first_fit or buddy)
-endif
 CTYPE	:= c S
 LD      := $(GCCPREFIX)ld
 LDFLAGS	:= -m elf64lriscv
@@ -106,6 +98,7 @@ $(call add_files_cc,$(call listf_cc,$(LIBDIR)),libs,)
 
 KINCLUDE	+= kern/debug/ \
 			   kern/driver/ \
+			   kern/trap/ \
 			   kern/mm/ \
 			   kern/arch/
 
@@ -113,6 +106,7 @@ KSRCDIR		+= kern/init \
 			   kern/libs \
 			   kern/debug \
 			   kern/driver \
+			   kern/trap \
 			   kern/mm
 
 KCFLAGS		+= $(addprefix -I,$(KINCLUDE))
@@ -150,15 +144,6 @@ $(call create_target,ucore.img)
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 $(call finish_all)
-
-# Switching allocator or make test must invalidate old object files.
-.PHONY: FORCE_CONFIG
-obj/.build-config: FORCE_CONFIG
-	@mkdir -p obj
-	@printf '%s\n' '$(PMM) $(filter test,$(MAKECMDGOALS))' > obj/.build-config.tmp
-	@cmp -s $@ obj/.build-config.tmp || cp obj/.build-config.tmp $@
-	@rm -f obj/.build-config.tmp
-$(ALLOBJS): obj/.build-config
 
 IGNORE_ALLDEPS	= clean \
 				  dist-clean \
@@ -213,11 +198,11 @@ GRADE_GDB_IN	:= .gdb.in
 GRADE_QEMU_OUT	:= .qemu.out
 HANDIN			:= proj$(PROJ)-handin.tar.gz
 
-TOUCH_FILES		:=
+TOUCH_FILES		:= kern/trap/trap.c
 
 MAKEOPTS		:= --quiet --no-print-directory
 
-GRADE_TMP	:= /tmp/lab2_grade
+GRADE_TMP	:= /tmp/lab3_grade
 
 grade:
 	$(V)$(MAKE) $(MAKEOPTS) clean

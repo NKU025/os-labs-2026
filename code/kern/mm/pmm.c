@@ -8,10 +8,9 @@
 #include <sbi.h>
 #include <stdio.h>
 #include <string.h>
+#include <../sync/sync.h>
 #include <riscv.h>
 #include <dtb.h>
-#include <buddy_pmm.h>
-#include <slub.h>
 
 // virtual address of physical page array
 struct Page *pages;
@@ -36,13 +35,7 @@ static void check_alloc_page(void);
 
 // init_pmm_manager - initialize a pmm_manager instance
 static void init_pmm_manager(void) {
-#if defined(PMM_USE_BUDDY)
-    pmm_manager = &buddy_pmm_manager;
-#elif defined(PMM_USE_FIRST_FIT)
     pmm_manager = &default_pmm_manager;
-#else
-    pmm_manager = &best_fit_pmm_manager;
-#endif
     cprintf("memory management: %s\n", pmm_manager->name);
     pmm_manager->init();
 }
@@ -55,30 +48,50 @@ static void init_memmap(struct Page *base, size_t n) {
 // alloc_pages - call pmm->alloc_pages to allocate a continuous n*PAGESIZE
 // memory
 struct Page *alloc_pages(size_t n) {
-    return pmm_manager->alloc_pages(n);
+    struct Page *page = NULL;
+    bool intr_flag;
+    local_intr_save(intr_flag);
+    {
+        page = pmm_manager->alloc_pages(n);
+    }
+    local_intr_restore(intr_flag);
+    return page;
 }
 
 // free_pages - call pmm->free_pages to free a continuous n*PAGESIZE memory
 void free_pages(struct Page *base, size_t n) {
-    pmm_manager->free_pages(base, n);
+    bool intr_flag;
+    local_intr_save(intr_flag);
+    {
+        pmm_manager->free_pages(base, n);
+    }
+    local_intr_restore(intr_flag);
 }
 
 // nr_free_pages - call pmm->nr_free_pages to get the size (nr*PAGESIZE)
 // of current free memory
 size_t nr_free_pages(void) {
-    return pmm_manager->nr_free_pages();
+    size_t ret;
+    bool intr_flag;
+    local_intr_save(intr_flag);
+    {
+        ret = pmm_manager->nr_free_pages();
+    }
+    local_intr_restore(intr_flag);
+    return ret;
 }
 
 //lab2 function1 2412509
 static void page_init(void) {
     // 1. 使用启动汇编已经建立的映射关系；本函数不负责创建页表。
     va_pa_offset = PHYSICAL_MEMORY_OFFSET;
+    const uintptr_t kernel_begin_pa = PADDR(KERNBASE);
     uint64_t mem_base = get_memory_base();
     uint64_t mem_size = get_memory_size();
 
-    // 本框架的页号从 DRAM_BASE 算起，内核固定装入 KERNEL_BEGIN_PADDR。
+    // 本框架的页号从 DRAM_BASE 算起，内核固定装入 kernel_begin_pa。
     // 设备树给出的单段 RAM 必须覆盖该内核位置，且相加不能溢出。
-    if (mem_base < DRAM_BASE || mem_base > KERNEL_BEGIN_PADDR ||
+    if (mem_base < DRAM_BASE || mem_base > kernel_begin_pa ||
         mem_size == 0 || mem_size > (uint64_t)-1 - mem_base) {
         panic("page_init: invalid physical memory range");
     }
@@ -87,15 +100,12 @@ static void page_init(void) {
             mem_base, mem_end, mem_size);
 
     // 2. 只管理 RAM 和框架允许范围的交集，末尾不足一页的部分不使用。
-    uintptr_t maxpa = PHYSICAL_MEMORY_END;
-    if (maxpa > PADDR(KERNTOP)) {
-        maxpa = PADDR(KERNTOP);
-    }
+    uintptr_t maxpa = PADDR(KERNTOP);
     if (mem_end < maxpa) {
         maxpa = mem_end;
     }
     maxpa = ROUNDDOWN(maxpa, PGSIZE);
-    if (maxpa <= KERNEL_BEGIN_PADDR) {
+    if (maxpa <= kernel_begin_pa) {
         panic("page_init: no memory for the kernel");
     }
 
@@ -107,7 +117,7 @@ static void page_init(void) {
     // 3. 把 Page 数组放在内核末尾之后，数组起点按页向上对齐。
     extern char end[];
     uintptr_t kernel_end_pa = PADDR((uintptr_t)end);
-    if (kernel_end_pa < KERNEL_BEGIN_PADDR || kernel_end_pa > maxpa) {
+    if (kernel_end_pa < kernel_begin_pa || kernel_end_pa > maxpa) {
         panic("page_init: kernel lies outside usable memory");
     }
     uintptr_t pages_pa = ROUNDUP(kernel_end_pa, PGSIZE);
@@ -163,8 +173,6 @@ void pmm_init(void) {
     satp_virtual = (pte_t*)boot_page_table_sv39;
     satp_physical = PADDR(satp_virtual);
     cprintf("satp virtual address: 0x%016lx\nsatp physical address: 0x%016lx\n", satp_virtual, satp_physical);
-    slub_init();
-    slub_self_test();
 }
 
 static void check_alloc_page(void) {
